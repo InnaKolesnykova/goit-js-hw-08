@@ -1,31 +1,62 @@
-// Add imports above this line
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css'; 
-import { galleryItems } from './gallery-items.js'; 
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
+
+import { galleryItems } from './gallery-items';
+import simpleLightbox from "simplelightbox";
 // Change code below this line
 
-console.log(galleryItems);
+const list = document.querySelector("ul.gallery");
 
-document.addEventListener('DOMContentLoaded', () => {
-  const galleryContainer = document.querySelector('.gallery');
 
-  // Function to create gallery items
-  function createGalleryItems(items) {
-    return items.map(({ original, preview, description }) => {
-      return `
-        <li class="gallery__item">
-          <a class="gallery__link" href="${original}">
-            <img class="gallery__image" src="${preview}" alt="${description}" />
-          </a>
-        </li>
-      `;
-    }).join('');
+const galleryMarkup = galleryItems
+  .map(
+    ({ preview, original, description }) =>
+      `<a class="gallery__item" href="${original}">
+      <img
+         class="gallery__image"
+         src="${preview}"
+         alt="${description}"
+    />
+  </a>`
+  )
+  .join('');
+
+
+list.innerHTML = galleryMarkup;
+list.addEventListener("click", selectItem);
+
+function selectItem(evt) {
+  evt.preventDefault();
+
+  if (!evt.target.classList.contains("gallery__image")) {
+    return;
   }
 
-  galleryContainer.innerHTML = createGalleryItems(galleryItems);
+  const instance = simpleLightbox(
+    `<img src="${evt.target.dataset.source}">`,
+    {
+      onShow: (instance) => {
+        document.addEventListener("keydown", onEscKeyPress);
+      },
+      onClose: (instance) => {
+        document.removeEventListener("keydown", onEscKeyPress);
+      },
+    }
+  );
+  instance.show();
 
-  const lightbox = new SimpleLightbox('.gallery a', {
-    captionsData: 'alt',
-    captionDelay: 250
-  });
+  function onEscKeyPress(event) {
+    if (event.code === "Escape") {
+      instance.close();
+    }
+  }
+}
+
+new SimpleLightbox('.gallery a', {
+  captions: true,
+  captionType: 'attr',
+  captionsData: 'alt',
+  captionPosition: 'bottom',
+  captionDelay: 250,
 });
+
