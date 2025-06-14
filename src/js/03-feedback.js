@@ -32,12 +32,7 @@ feedbackForm.addEventListener('submit', event => {
         message: messageInput.value
     });
 
-    const formState = {
-        email: emailInput.value,
-        message: messageInput.value
-    };
-    localStorage.setItem('feedback-form-state', JSON.stringify(formState));
+    localStorage.removeItem('feedback-form-state');
 
-    emailInput.value = '';
-    messageInput.value = '';
+    feedbackForm.reset();
 });
